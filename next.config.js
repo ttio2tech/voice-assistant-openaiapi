@@ -1,4 +1,9 @@
+/** @type {import('next').NextConfig} */
+const webpack = require("webpack");
+
 module.exports = {  
+    reactStrictMode: true,
+    
     webpack: (config, { isServer, webpack }) => {
       if (!isServer) {
         config.plugins.push(

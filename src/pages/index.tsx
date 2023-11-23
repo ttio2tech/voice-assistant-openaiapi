@@ -10,6 +10,11 @@ export default function Home() {
   const [isRecording, setIsRecording] = useState(false);
   const [isTranscribing, setIsTranscribing] = useState(false);
   const [transcriptions, setTranscriptions] = useState<string[]>([]);
+  const [selectedVoice, setselectedVoice] = useState('alloy');
+
+  const handlevoicesel = (event: any) => {
+    setselectedVoice(event.target.value);
+  };
 
   const startRecording = () => {
     if (isRecording) return;
@@ -67,17 +72,13 @@ export default function Home() {
             `User: ${jsonResponse.transcription}`,
           ]);
 
-          // call LLM 
-          //abortController.current = new AbortController();
           const responseA = await fetch("/api/chatllm", {
             method: "POST",
             headers: { "Content-Type": "application/json" },
             body: JSON.stringify(jsonResponse.transcription),
-            //signal: abortController.current.signal,
           });
           if (responseA.ok) {
             const data = await responseA.json();
-            //console.log(data[0].message.content);
             const messageContent = data[0].message.content;
             console.log(messageContent)
             setTranscriptions((previousTranscriptions) => [
@@ -89,7 +90,8 @@ export default function Home() {
               headers: {
                 'Content-Type': 'application/json',
               },
-              body: JSON.stringify( { text: messageContent } ),
+              body: JSON.stringify( { text:  messageContent, 
+                                      voice: selectedVoice } ),
             });
             if (!responseTTS.ok) {
               throw new Error('Speech synthesis failed');
@@ -100,7 +102,6 @@ export default function Home() {
             const audio = new Audio(audioUrl);
             audio.play();
           }
-          //setText(jsonResponse.transcription)
 
         } finally {
           setIsTranscribing(false);
@@ -192,6 +193,15 @@ export default function Home() {
           }}
         >
           <Box sx={{ padding: 2 }}>
+          Select the output voice type: 
+          <select value={selectedVoice} onChange={handlevoicesel}>
+            <option value="alloy">Alloy</option>
+            <option value="echo">Echo</option>
+            <option value="fable">Fable</option>
+            <option value="onyx">Onyx</option>
+            <option value="nova">Nova</option>
+            <option value="shimmer">Shimmer</option>   
+          </select>      
             <IconButton
               style={{
                 background: "darkorange",

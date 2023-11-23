@@ -1,7 +1,5 @@
 // pages/api/speech.ts
 import OpenAI from "openai";
-import fs from "fs";
-import path from "path";
 
 // Initialize OpenAI with your API key
 const openai = new OpenAI({
@@ -11,7 +9,7 @@ const openai = new OpenAI({
 export default async function handler(req: any, res: any) {
   if (req.method === 'POST') {
     try {
-      const { text } = req.body;
+      const { text,voice } = req.body;
       console.log('----')
       console.log(text)
 
@@ -21,7 +19,7 @@ export default async function handler(req: any, res: any) {
 
       const mp3 = await openai.audio.speech.create({
         model: "tts-1",
-        voice: "alloy",
+        voice: voice,
         input: text,
       });
 
